@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # Set the URL of the webpage that you want to crawl
-url = "https://www.cnn.com"
+url = "https://www.techtarget.com"
 
 # Download the HTML of the webpage
 response = requests.get(url)

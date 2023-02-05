@@ -11,8 +11,8 @@ def get_page(url):
     
     return soup
 
-robots = get_page("https://www.facebook.com/robots.txt")
-print(robots)
+robots = get_page("https://www.techtarget.com/robots.txt")
+# print(robots)
 
 def get_sitemaps(robots):
     data = []

@@ -27,3 +27,5 @@ for url in urls:
     # Write the HTML soup to the file
     with open(file_name, 'w') as f:
         f.write(str(soup))
+
+

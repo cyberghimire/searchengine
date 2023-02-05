@@ -5,14 +5,14 @@ import networkx as nx
 import glob
 
 # specify the directory path and file extension
-path = '/path/to/directory'
+path = '/html_files'
 extension = '*.html'
 
 # use the glob function to get a list of files
 html_files = glob.glob(path + '/' + extension)
 
 # print the list of files
-print(files)
+# print(files)
 
 
 # Create an empty directed graph
@@ -33,3 +33,4 @@ pr = nx.pagerank(G)
 
 # Sort HTML files according to their PageRank scores
 sorted_html_files = sorted(html_files, key=lambda x: pr[x], reverse=True)
+print(sorted_html_files)
