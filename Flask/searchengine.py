@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
-
-
+import pickle
 import os
 import networkx as nx
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -40,7 +39,13 @@ data = []
 def result():
     return render_template('results.html', data=data)
 
-query = ""
+# query = ""
+def load_tokenized_text(filename):
+    # with open(filename, 'rb') as f:
+    #     vectorized_docs = pickle.load(f)
+    tokenized_text = pickle.load(open(filename, 'rb'))
+    return tokenized_text
+
 text_content = []
 @app.route("/search", methods = ['GET','POST'])
 def searchx():
@@ -48,28 +53,31 @@ def searchx():
         query = request.form['query']
         if query=="":
             return render_template("search.html")
+        
         websites = ['http://localhost:5000/a', 'http://localhost:5000/b', 'http://localhost:5000/c', 'http://localhost:5000/d', 'http://localhost:5000/e']
-        text_content = []
-        for website in websites:
-            # url = 'http://' + website
-            response = requests.get(website)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            text_content.append(soup.get_text())
-        stop_words = ['the', 'is', 'and', 'to', 'of', 'a', 'in', 'that', 'for', 'it']
-        tokenized_text = []
-        for content in text_content:
-            tokens = content.lower().split()
-            tokenized_text.append([token for token in tokens if token not in stop_words])
+        # text_content = []
+        # for website in websites:
+        #     # url = 'http://' + website
+        #     response = requests.get(website)
+        #     soup = BeautifulSoup(response.text, 'html.parser')
+        #     text_content.append(soup.get_text())
+        # stop_words = ['the', 'is', 'and', 'to', 'of', 'a', 'in', 'that', 'for', 'it']
+        # tokenized_text = []
+        # for content in text_content:
+        #     tokens = content.lower().split()
+        #     tokenized_text.append([token for token in tokens if token not in stop_words])
 
-        # Calculate tf-idf
+        # # Calculate tf-idf
+        tokenized_text = load_tokenized_text('tokenized_text.pkl')
         tfidf = TfidfVectorizer()
         tfidf_vectors = tfidf.fit_transform([' '.join(tokens) for tokens in tokenized_text])
-
+        # print(tfidf_vectors)
+       
+        
         # Search using cosine similarity
         # query = "Aadarsha"
         query_vector = tfidf.transform([query])
         similarities = cosine_similarity(query_vector, tfidf_vectors)
-
 
         # Create a graph and add edges based on similarity scores
         # G = nx.Graph()
@@ -96,7 +104,7 @@ def searchx():
         pagerank = nx.pagerank(G, weight = 'weight')
 
         # Sort files by PageRank and return top results
-        ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
+        ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=False)
 
         # top_results = ranked_results[:3]
         top_results = [x[0] for x in ranked_results if x[1]>0.2]
