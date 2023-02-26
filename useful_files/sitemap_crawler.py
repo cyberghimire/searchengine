@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # Get robots.txt file
-r = requests.get("https://www.cnn.com/robots.txt")
+r = requests.get("https://www.bbc.com/robots.txt")
 robots_txt = r.text
 
 # Extract sitemap from robots.txt

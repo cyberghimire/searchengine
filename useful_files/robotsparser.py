@@ -1,7 +1,7 @@
 import requests
 
 # Specify the URL of the robots.txt file
-robots_url = "http://www.techtarget.com/robots.txt"
+robots_url = "http://www.bbc.com/robots.txt"
 
 # Send a request to the robots.txt URL
 response = requests.get(robots_url)

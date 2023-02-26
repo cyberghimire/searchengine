@@ -4,6 +4,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from bs4 import BeautifulSoup
 import requests
+from nltk.corpus import stopwords
+import nltk
 
 # Parse HTML files and extract text content
 # html_files = ["../html_files/A.html", "../html_files/B.html", "../html_files/C.html", "../html_files/D.html", "../html_files/E.html"]
@@ -43,9 +45,9 @@ for website in websites:
     text_content.append(soup.get_text())
     
 
-
+# nltk.download("stopwords")
 # Tokenize and remove stop words
-stop_words = ['the', 'is', 'and', 'to', 'of', 'a', 'in', 'that', 'for', 'it']
+stop_words = set(stopwords.words("english"))
 tokenized_text = []
 for content in text_content:
     tokens = content.lower().split()
@@ -56,7 +58,7 @@ tfidf = TfidfVectorizer()
 tfidf_vectors = tfidf.fit_transform([' '.join(tokens) for tokens in tokenized_text])
 
 # Search using cosine similarity
-query = "Aadarsha"
+query = "Peter"
 query_vector = tfidf.transform([query])
 similarities = cosine_similarity(query_vector, tfidf_vectors)
 
@@ -86,9 +88,9 @@ for i, file in enumerate(websites):
 pagerank = nx.pagerank(G, weight = 'weight')
 
 # Sort files by PageRank and return top results
-ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
+ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=False)
 
 # top_results = ranked_results[:3]
-top_results = [x[0] for x in ranked_results if x[1]>0.2]
+top_results = [x[0] for x in ranked_results if x[1]>0.14]
 # results = dict((x) for x, y in top_results)
 print(top_results)

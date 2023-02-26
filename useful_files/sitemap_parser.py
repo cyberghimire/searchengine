@@ -13,7 +13,7 @@ def get_sitemap(url):
 
     return xml
 
-url = "https://www.udemy.com/sitemap.xml"
+url = "https://www.cnn.com/sitemap.xml"
 xml = get_sitemap(url)
 
 def get_sitemap_type(xml):

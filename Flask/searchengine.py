@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from bs4 import BeautifulSoup
 import requests
 
-app = Flask(__name__, template_folder="../html_files/")
+app = Flask(__name__, template_folder="../html_files/", static_folder="../html_files/images")
 
 @app.route("/")
 def search():
@@ -33,20 +33,13 @@ def d():
 def e():
     return render_template('E.html')
 
-data = []
 
-@app.route("/result")
-def result():
-    return render_template('results.html', data=data)
-
-# query = ""
 def load_tokenized_text(filename):
-    # with open(filename, 'rb') as f:
-    #     vectorized_docs = pickle.load(f)
     tokenized_text = pickle.load(open(filename, 'rb'))
     return tokenized_text
 
-text_content = []
+
+
 @app.route("/search", methods = ['GET','POST'])
 def searchx():
     if request.method == 'POST':
@@ -54,64 +47,55 @@ def searchx():
         if query=="":
             return render_template("search.html")
         
-        websites = ['http://localhost:5000/a', 'http://localhost:5000/b', 'http://localhost:5000/c', 'http://localhost:5000/d', 'http://localhost:5000/e']
-        # text_content = []
-        # for website in websites:
-        #     # url = 'http://' + website
-        #     response = requests.get(website)
-        #     soup = BeautifulSoup(response.text, 'html.parser')
-        #     text_content.append(soup.get_text())
-        # stop_words = ['the', 'is', 'and', 'to', 'of', 'a', 'in', 'that', 'for', 'it']
-        # tokenized_text = []
-        # for content in text_content:
-        #     tokens = content.lower().split()
-        #     tokenized_text.append([token for token in tokens if token not in stop_words])
+        websites = ['http://localhost:5000/a', 'http://localhost:5000/b', 
+                    'http://localhost:5000/c', 'http://localhost:5000/d', 'http://localhost:5000/e']
+  
 
         # # Calculate tf-idf
         tokenized_text = load_tokenized_text('tokenized_text.pkl')
         tfidf = TfidfVectorizer()
         tfidf_vectors = tfidf.fit_transform([' '.join(tokens) for tokens in tokenized_text])
-        # print(tfidf_vectors)
+
        
         
         # Search using cosine similarity
-        # query = "Aadarsha"
+
         query_vector = tfidf.transform([query])
         similarities = cosine_similarity(query_vector, tfidf_vectors)
 
+        if all_zeros(similarities[0]):
+            return render_template("notfound.html")
+
         # Create a graph and add edges based on similarity scores
-        # G = nx.Graph()
         G=nx.DiGraph()
 
-        for i, file in enumerate(websites):
-            G.add_node(file)
+
+        for i, link in enumerate(websites):
+            G.add_node(link)
             for j, sim in enumerate(similarities[0]):
                 if sim > 0 and i != j:
-                    G.add_edge(file, websites[j], weight=sim)
+                    G.add_edge(link, websites[j], weight=sim)
+                    # G.add_edge(link, websites[j])
 
-        # for file, links in outgoing_links.items():
-        #     G.add_node(file)
-        #     for link in links:
-        #         G.add_edge(file, link)
-
-        # for file, links in outgoing_links.items():
-        #     G.add_node(file)
-        #     for j, sim in enumerate(similarities[0]):
-        #         if sim > 0 and i != j:
-        #             G.add_edge(file, html_files[j], weight=sim)
 
         # Calculate PageRank
-        pagerank = nx.pagerank(G, weight = 'weight')
+        # pagerank = nx.pagerank(G, weight = 'weight')
+        pagerank = nx.pagerank(G)
 
         # Sort files by PageRank and return top results
-        ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=False)
+        ranked_results = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)
 
+        top_results = [x[0] for x in ranked_results if x[1]>=0.14]
         # top_results = ranked_results[:3]
-        top_results = [x[0] for x in ranked_results if x[1]>0.2]
 
-        if len(top_results) == 0:
-            return render_template("notfound.html")
         return render_template('results.html', data=top_results)
+
+
+def all_zeros(lst):
+    for i in lst:
+        if i != 0:
+            return False
+    return True
 
 
 if __name__ == '__main__':

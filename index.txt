@@ -1,5 +1,0 @@
-fish:0,2
-dog:0,1
-cat:0
-horse:1,2
-bird:1,2

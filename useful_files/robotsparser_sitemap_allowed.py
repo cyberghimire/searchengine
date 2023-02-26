@@ -11,7 +11,7 @@ def get_page(url):
     
     return soup
 
-robots = get_page("https://www.techtarget.com/robots.txt")
+robots = get_page("https://www.bbc.com/robots.txt")
 # print(robots)
 
 def get_sitemaps(robots):
@@ -19,7 +19,7 @@ def get_sitemaps(robots):
     lines = str(robots).lower().splitlines()
 
     for line in lines:
-        if line.startswith('sitemap:'):
+        if line.lower().startswith('sitemap:'):
             split = line.split(':', maxsplit = 1)
             data.append(split[1].strip())
 
@@ -30,13 +30,13 @@ def get_allowed(robots):
     lines = str(robots).lower().splitlines()
 
     for line in lines:
-        if line.startswith('allow:'):
+        if line.lower().startswith('allow:'):
             split = line.split(':', maxsplit = 1)
             allowed.add(split[1])
     return allowed
 
 sitemaps = get_sitemaps(robots)
-print(sitemaps)
+# print(sitemaps)
 
 allowed = get_allowed(robots)
 print(allowed)
